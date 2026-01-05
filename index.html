@@ -222,57 +222,67 @@ h1{
 <body>
   <div class="wrap">
     <header>
-      <div>
-        <h1><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-world-code"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20.942 13.02a9 9 0 1 0 -9.47 7.964" /><path d="M3.6 9h16.8" /><path d="M3.6 15h9.9" /><path d="M11.5 3a17 17 0 0 0 0 18" /><path d="M12.5 3c2 3.206 2.837 6.913 2.508 10.537" /><path d="M20 21l2 -2l-2 -2" /><path d="M17 17l-2 2l2 2" /></svg> User Agent Detector</h1>
-      </div>
-      <button class="btn" id="btnRefresh" type="button">
-        <span>Refresh</span>
-      </button>
+      <h1>User Agent Detector</h1>
+      <button class="btn" id="btnRefresh">Refresh</button>
     </header>
 
     <div class="grid">
       <section class="card">
-        <div class="body">
-          <div class="row">
-            <div class="left">
-              <div class="logo" id="browserLogo" aria-hidden="true"></div>
-              <div class="titleblock">
-                <p class="big" id="browserName">—</p>
-              </div>
+        <div class="row">
+          <div class="left">
+            <div class="logo" id="browserLogo"></div>
+            <div class="titleblock">
+              <div class="k">Browser</div>
+              <p class="big" id="browserName">—</p>
             </div>
-            <span class="badge" id="chromiumBadge"><span class="dot" id="chromiumDot"></span><span id="chromiumText">—</span></span>
           </div>
+          <span class="badge"><span class="dot" id="chromiumDot"></span><span id="chromiumText">—</span></span>
+        </div>
 
-          <div class="row">
-            <div style="min-width:0">
-              <div class="k">Version</div>
-              <div class="v" id="browserVersion">—</div>
-            </div>
-            <div style="min-width:0;text-align:right">
-              <div class="k">Platform</div>
-              <div class="v" id="platformInfo">—</div>
-            </div>
+        <div class="row">
+          <div style="flex:1">
+            <div class="k">Version</div>
+            <div class="v" id="browserVersion">—</div>
           </div>
+          <div style="flex:1; text-align:right">
+            <div class="k">Platform</div>
+            <div class="v" id="platformInfo">—</div>
+          </div>
+        </div>
 
-          <div class="row">
-            <div style="min-width:0">
-              <div class="k">Client Hints</div>
-              <div class="chips" id="brandChips"></div>
-            </div>
+        <div class="row">
+          <div style="flex:1">
+            <div class="k">Language</div>
+            <div class="v" id="deviceLang">—</div>
           </div>
+          <div style="flex:1; text-align:right">
+            <div class="k">Timezone</div>
+            <div class="v" id="timeZone">—</div>
+          </div>
+        </div>
 
-          <div class="row">
-            <div style="min-width:0;width:100%">
-              <div class="k">User-Agent</div>
-              <div class="v" id="uaText">—</div>
-            </div>
+        <div class="row">
+          <div style="flex:1">
+            <div class="k">Resolution</div>
+            <div class="v" id="screenRes">—</div>
           </div>
-          
-          <div class="row">
-            <div style="min-width:0;width:100%">
-              <div class="k">JavaScript</div>
-              <div class="v" id="adblockJSStatus">—</div>
-            </div>
+          <div style="flex:1; text-align:right">
+            <div class="k">JavaScript</div>
+            <div class="v" id="jsStatus">Enabled</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="width:100%">
+            <div class="k">Client Hints</div>
+            <div class="chips" id="brandChips"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="width:100%">
+            <div class="k">User-Agent</div>
+            <div class="v" id="uaText">—</div>
           </div>
         </div>
       </section>
@@ -282,37 +292,16 @@ h1{
 <script>
 class BrowserDetector {
   #rules = [
-    { name: 'Samsung Internet', family: 'Samsung Internet', re: /SamsungBrowser\/([\d.]+)/, chromium: true },
-    { name: 'Yandex', family: 'Yandex', re: /YaBrowser\/([\d.]+)/, chromium: true },
-    { name: 'DuckDuckGo', family: 'DuckDuckGo', re: /DuckDuckGo\/([\d.]+)/, chromium: false },
-    { name: 'Vivaldi', family: 'Vivaldi', re: /Vivaldi\/([\d.]+)/, chromium: true },
-    { name: 'Opera', family: 'Opera', re: /OPR\/([\d.]+)/, chromium: true },
-    { name: 'Edge', family: 'Edge', re: /Edg\/([\d.]+)/, chromium: true },
     { name: 'Brave', family: 'Brave', re: /Brave\/([\d.]+)/, chromium: true },
+    { name: 'Edge', family: 'Edge', re: /Edg\/([\d.]+)/, chromium: true },
+    { name: 'Samsung Internet', family: 'Samsung Internet', re: /SamsungBrowser\/([\d.]+)/, chromium: true },
+    { name: 'Opera', family: 'Opera', re: /OPR\/([\d.]+)/, chromium: true },
+    { name: 'Vivaldi', family: 'Vivaldi', re: /Vivaldi\/([\d.]+)/, chromium: true },
     { name: 'Arc', family: 'Arc', re: /Arc\/([\d.]+)/, chromium: true },
-    { name: 'Wavebox', family: 'Wavebox', re: /Wavebox\/([\d.]+)/, chromium: true },
-    { name: 'Chromium', family: 'Chromium', re: /Chromium\/([\d.]+)/, chromium: true },
     { name: 'Chrome', family: 'Chrome', re: /Chrome\/([\d.]+)/, chromium: true },
     { name: 'Firefox', family: 'Firefox', re: /Firefox\/([\d.]+)/, chromium: false },
-    { name: 'Firefox iOS', family: 'Firefox', re: /FxiOS\/([\d.]+)/, chromium: false },
     { name: 'Safari', family: 'Safari', re: /Version\/([\d.]+).*Safari/, chromium: false }
   ];
-
-  #logoMap = {
-    chrome: 'src/chrome.svg',
-    chromium: 'src/chromium.svg',
-    edge: 'src/edge.svg',
-    firefox: 'src/firefox.svg',
-    safari: 'src/safari.svg',
-    opera: 'src/opera.svg',
-    brave: 'src/brave.svg',
-    vivaldi: 'src/vivaldi.svg',
-    yandex: 'src/yandex.svg',
-    samsung: 'src/samsung.svg',
-    duckduckgo: 'src/duckduckgo.svg',
-    arc: 'src/arc.svg',
-    wavebox: 'src/wavebox.svg'
-  };
 
   constructor() {
     this.ua = navigator.userAgent;
@@ -322,35 +311,46 @@ class BrowserDetector {
   get data() {
     const platform = this.uaData?.platform || navigator.platform || 'Unknown';
     const clientHints = this.#parseClientHints();
-    
-    if (clientHints) return { ...clientHints, platform };
-    
     const legacy = this.#parseUserAgent();
-    return { ...legacy, platform };
+    
+    const finalInfo = (clientHints && clientHints.name !== 'Chromium' && clientHints.name !== 'Google Chrome') 
+      ? { ...clientHints, platform } 
+      : { ...legacy, platform };
+
+    return {
+      ...finalInfo,
+      lang: navigator.language,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      resolution: `${window.screen.width}x${window.screen.height}`,
+      brands: this.#getCleanBrands()
+    };
+  }
+
+  #getCleanBrands() {
+    if (!this.uaData?.brands) return [];
+    return this.uaData.brands
+      .filter(b => !/not.a.brand/i.test(b.brand))
+      .map(b => ({
+        brand: b.brand.replace(/Google |brand/gi, '').trim(),
+        version: b.version
+      }));
   }
 
   #parseClientHints() {
-    if (!this.uaData?.brands?.length) return null;
-
-    const brands = this.uaData.brands
-      .filter(b => !/not.a.brand/i.test(b.brand))
-      .map(b => ({ brand: b.brand, version: b.version }));
-
-    const priority = ['Microsoft Edge', 'Opera', 'Brave', 'Vivaldi', 'Arc', 'Wavebox', 'Yandex', 'Samsung Internet', 'Google Chrome', 'Chromium'];
+    if (!this.uaData?.brands) return null;
+    const brands = this.uaData.brands;
     
+    if (brands.some(b => b.brand === 'Brave')) {
+      const b = brands.find(b => b.brand === 'Brave');
+      return { name: 'Brave', family: 'Brave', versionFull: b.version, versionMajor: b.version, isChromium: true, engine: 'Blink' };
+    }
+
+    const priority = ['Microsoft Edge', 'Opera', 'Vivaldi', 'Arc', 'Samsung Internet', 'Google Chrome', 'Chromium'];
     for (const name of priority) {
       const found = brands.find(b => b.brand === name);
       if (found) {
-        const family = found.brand.replace('Google ', '');
-        return {
-          name: family,
-          family: family,
-          versionFull: found.version,
-          versionMajor: found.version.split('.')[0],
-          isChromium: true,
-          engine: 'Blink',
-          brands
-        };
+        const cleanName = found.brand.replace('Google ', '');
+        return { name: cleanName, family: cleanName, versionFull: found.version, versionMajor: found.version, isChromium: true, engine: 'Blink' };
       }
     }
     return null;
@@ -360,29 +360,15 @@ class BrowserDetector {
     for (const rule of this.#rules) {
       const match = this.ua.match(rule.re);
       if (match) {
-        return {
-          name: rule.name,
-          family: rule.family,
-          versionFull: match[1],
-          versionMajor: match[1].split('.')[0],
-          isChromium: rule.chromium,
-          engine: this.#getEngine(rule.family, rule.chromium),
-          brands: []
-        };
+        return { name: rule.name, family: rule.family, versionFull: match[1], versionMajor: match[1].split('.')[0], isChromium: rule.chromium, engine: rule.chromium ? 'Blink' : (rule.family === 'Firefox' ? 'Gecko' : 'WebKit') };
       }
     }
-    return { name: 'Unknown', family: 'Unknown', versionFull: '', versionMajor: '', isChromium: false, engine: 'Unknown', brands: [] };
+    return { name: 'Unknown', family: 'Unknown', versionFull: '', versionMajor: '', isChromium: false, engine: 'Unknown' };
   }
 
-  #getEngine(family, isChromium) {
-    if (family === 'Safari') return 'WebKit';
-    if (family === 'Firefox') return 'Gecko';
-    return isChromium ? 'Blink' : 'Unknown';
-  }
-
-  getIcon(name) {
-    const key = name.toLowerCase().split(' ')[0];
-    return this.#logoMap[key] || 'src/globe.svg';
+  getIconPath(name) {
+    const key = name.toLowerCase().replace(/\s+/g, '');
+    return `src/${key}.svg`;
   }
 }
 
@@ -398,7 +384,9 @@ class BrowserUI {
       chips: document.querySelector('#brandChips'),
       dot: document.querySelector('#chromiumDot'),
       status: document.querySelector('#chromiumText'),
-      jsStatus: document.querySelector('#adblockJSStatus'),
+      lang: document.querySelector('#deviceLang'),
+      tz: document.querySelector('#timeZone'),
+      res: document.querySelector('#screenRes'),
       refresh: document.querySelector('#btnRefresh')
     };
     this.init();
@@ -411,48 +399,30 @@ class BrowserUI {
 
   update() {
     const info = this.detector.data;
-    
-    this.nodes.jsStatus.textContent = 'Enabled';
     this.nodes.name.textContent = info.name;
     this.nodes.platform.textContent = info.platform;
     this.nodes.ua.textContent = this.detector.ua;
+    this.nodes.version.textContent = info.versionFull;
+    this.nodes.lang.textContent = info.lang;
+    this.nodes.tz.textContent = info.timezone;
+    this.nodes.res.textContent = info.resolution;
     
-    this.nodes.logo.innerHTML = `<img src="${this.detector.getIcon(info.name)}" alt="logo" width="22" height="22" />`;
-    
-    this.nodes.version.textContent = info.versionMajor 
-      ? `${info.versionMajor}${info.versionFull !== info.versionMajor ? ` (${info.versionFull})` : ''}`
-      : 'Unavailable';
+    this.nodes.logo.innerHTML = `<img src="${this.detector.getIconPath(info.name)}" alt="" width="24" height="24" onerror="this.src='src/globe.svg'">`;
 
-    this.#renderBrands(info.brands);
-    this.#renderEngineBadge(info);
-  }
+    const isChromium = info.isChromium;
+    this.nodes.dot.className = isChromium ? 'dot ok' : 'dot';
+    this.nodes.status.textContent = isChromium ? 'Chromium' : info.engine;
 
-  #renderBrands(brands) {
-    this.nodes.chips.innerHTML = brands.length 
-      ? brands.map(b => `<span class="chip">${b.brand} ${b.version}</span>`).join('')
-      : '<span class="chip">Not available</span>';
-  }
-
-  #renderEngineBadge(info) {
-    const isChromium = info.isChromium || ['Chrome', 'Edge', 'Opera', 'Brave', 'Vivaldi', 'Arc'].includes(info.family);
-    
-    if (isChromium) {
-      this.nodes.dot.className = 'dot ok';
-      this.nodes.status.textContent = 'Chromium';
-    } else if (info.name === 'Unknown') {
-      this.nodes.dot.className = 'dot warn';
-      this.nodes.status.textContent = 'Unknown';
-    } else {
-      this.nodes.dot.className = 'dot info';
-      this.nodes.status.textContent = info.engine;
-    }
+    this.nodes.chips.innerHTML = info.brands.length 
+      ? info.brands.map(b => `<span class="chip">${b.brand} ${b.version}</span>`).join('')
+      : '<span class="chip">Unavailable</span>';
   }
 }
 
 new BrowserUI(new BrowserDetector());
 </script>
-
 </body>
 </html>
+
 
 
