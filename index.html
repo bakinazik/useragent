@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -124,6 +124,10 @@ h1{
   border:1px solid var(--border);
   display:grid;
   place-items:center;
+}
+
+.logo img{
+    max-width: 24px;
 }
 
 .titleblock{min-width:0}
@@ -292,15 +296,19 @@ h1{
 <script>
 class BrowserDetector {
   #rules = [
-    { name: 'Brave', family: 'Brave', re: /Brave\/([\d.]+)/, chromium: true },
-    { name: 'Edge', family: 'Edge', re: /Edg\/([\d.]+)/, chromium: true },
-    { name: 'Samsung Internet', family: 'Samsung Internet', re: /SamsungBrowser\/([\d.]+)/, chromium: true },
-    { name: 'Opera', family: 'Opera', re: /OPR\/([\d.]+)/, chromium: true },
-    { name: 'Vivaldi', family: 'Vivaldi', re: /Vivaldi\/([\d.]+)/, chromium: true },
-    { name: 'Arc', family: 'Arc', re: /Arc\/([\d.]+)/, chromium: true },
-    { name: 'Chrome', family: 'Chrome', re: /Chrome\/([\d.]+)/, chromium: true },
-    { name: 'Firefox', family: 'Firefox', re: /Firefox\/([\d.]+)/, chromium: false },
-    { name: 'Safari', family: 'Safari', re: /Version\/([\d.]+).*Safari/, chromium: false }
+    { name: 'Brave', id: 'brave', re: /Brave\/([\d.]+)/, chromium: true },
+    { name: 'Edge', id: 'edge', re: /Edg\/([\d.]+)/, chromium: true },
+    { name: 'Samsung Internet', id: 'samsung', re: /SamsungBrowser\/([\d.]+)/, chromium: true },
+    { name: 'Opera', id: 'opera', re: /OPR\/([\d.]+)/, chromium: true },
+    { name: 'Vivaldi', id: 'vivaldi', re: /Vivaldi\/([\d.]+)/, chromium: true },
+    { name: 'Arc', id: 'arc', re: /Arc\/([\d.]+)/, chromium: true },
+    { name: 'Yandex', id: 'yandex', re: /YaBrowser\/([\d.]+)/, chromium: true },
+    { name: 'Wavebox', id: 'wavebox', re: /Wavebox\/([\d.]+)/, chromium: true },
+    { name: 'DuckDuckGo', id: 'duckduckgo', re: /DuckDuckGo\/([\d.]+)/, chromium: false },
+    { name: 'Chrome', id: 'chrome', re: /Chrome\/([\d.]+)/, chromium: true },
+    { name: 'Chromium', id: 'chromium', re: /Chromium\/([\d.]+)/, chromium: true },
+    { name: 'Firefox', id: 'firefox', re: /Firefox\/([\d.]+)/, chromium: false },
+    { name: 'Safari', id: 'safari', re: /Version\/([\d.]+).*Safari/, chromium: false }
   ];
 
   constructor() {
@@ -313,7 +321,8 @@ class BrowserDetector {
     const clientHints = this.#parseClientHints();
     const legacy = this.#parseUserAgent();
     
-    const finalInfo = (clientHints && clientHints.name !== 'Chromium' && clientHints.name !== 'Google Chrome') 
+    // Brave/Edge gibi Chromium maskeli tarayıcılarda Client Hint önceliği
+    const finalInfo = (clientHints && !['Chromium', 'Google Chrome'].includes(clientHints.name)) 
       ? { ...clientHints, platform } 
       : { ...legacy, platform };
 
@@ -340,17 +349,26 @@ class BrowserDetector {
     if (!this.uaData?.brands) return null;
     const brands = this.uaData.brands;
     
+    // Brave Check
     if (brands.some(b => b.brand === 'Brave')) {
       const b = brands.find(b => b.brand === 'Brave');
-      return { name: 'Brave', family: 'Brave', versionFull: b.version, versionMajor: b.version, isChromium: true, engine: 'Blink' };
+      return { name: 'Brave', id: 'brave', versionFull: b.version, isChromium: true, engine: 'Blink' };
     }
 
-    const priority = ['Microsoft Edge', 'Opera', 'Vivaldi', 'Arc', 'Samsung Internet', 'Google Chrome', 'Chromium'];
-    for (const name of priority) {
-      const found = brands.find(b => b.brand === name);
+    const priority = [
+      { b: 'Microsoft Edge', id: 'edge', n: 'Edge' },
+      { b: 'Opera', id: 'opera', n: 'Opera' },
+      { b: 'Vivaldi', id: 'vivaldi', n: 'Vivaldi' },
+      { b: 'Yandex', id: 'yandex', n: 'Yandex' },
+      { b: 'Wavebox', id: 'wavebox', n: 'Wavebox' },
+      { b: 'Google Chrome', id: 'chrome', n: 'Chrome' },
+      { b: 'Chromium', id: 'chromium', n: 'Chromium' }
+    ];
+
+    for (const item of priority) {
+      const found = brands.find(b => b.brand === item.b);
       if (found) {
-        const cleanName = found.brand.replace('Google ', '');
-        return { name: cleanName, family: cleanName, versionFull: found.version, versionMajor: found.version, isChromium: true, engine: 'Blink' };
+        return { name: item.n, id: item.id, versionFull: found.version, isChromium: true, engine: 'Blink' };
       }
     }
     return null;
@@ -360,15 +378,16 @@ class BrowserDetector {
     for (const rule of this.#rules) {
       const match = this.ua.match(rule.re);
       if (match) {
-        return { name: rule.name, family: rule.family, versionFull: match[1], versionMajor: match[1].split('.')[0], isChromium: rule.chromium, engine: rule.chromium ? 'Blink' : (rule.family === 'Firefox' ? 'Gecko' : 'WebKit') };
+        return { 
+          name: rule.name, 
+          id: rule.id, 
+          versionFull: match[1], 
+          isChromium: rule.chromium, 
+          engine: rule.chromium ? 'Blink' : (rule.id === 'firefox' ? 'Gecko' : 'WebKit') 
+        };
       }
     }
-    return { name: 'Unknown', family: 'Unknown', versionFull: '', versionMajor: '', isChromium: false, engine: 'Unknown' };
-  }
-
-  getIconPath(name) {
-    const key = name.toLowerCase().replace(/\s+/g, '');
-    return `src/${key}.svg`;
+    return { name: 'Unknown', id: 'globe', versionFull: '', isChromium: false, engine: 'Unknown' };
   }
 }
 
@@ -407,7 +426,8 @@ class BrowserUI {
     this.nodes.tz.textContent = info.timezone;
     this.nodes.res.textContent = info.resolution;
     
-    this.nodes.logo.innerHTML = `<img src="${this.detector.getIconPath(info.name)}" alt="" width="24" height="24" onerror="this.src='src/globe.svg'">`;
+    // SVG Path matching
+    this.nodes.logo.innerHTML = `<img src="src/${info.id}.svg" alt="" onerror="this.src='src/globe.svg'">`;
 
     const isChromium = info.isChromium;
     this.nodes.dot.className = isChromium ? 'dot ok' : 'dot';
@@ -423,6 +443,3 @@ new BrowserUI(new BrowserDetector());
 </script>
 </body>
 </html>
-
-
-
