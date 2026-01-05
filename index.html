@@ -5,227 +5,218 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>User Agent Detector</title>
   <style>
-  
-  *{
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-    box-sizing: border-box;
-  }
-  
-    :root{
-      --bg:#0b0f17;
-      --panel:#111827;
-      --panel2:#0f172a;
-      --text:#e5e7eb;
-      --muted:#94a3b8;
-      --border:rgba(255,255,255,.08);
-      --ok:#22c55e;
-      --warn:#f59e0b;
-      --bad:#ef4444;
-      --info:#3b82f6;
-      --chip:rgba(148,163,184,.14);
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-    }
-    *{box-sizing:border-box}
-html, body {
-  width: 100%;
-  min-height: 100%;
+/* =========================
+   RESET + TEMEL
+========================= */
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
-body {
-  margin: 0;
-  font-family: var(--sans);
-  color: var(--text);
+html,body{
+  width:100%;
+  min-height:100%;
+}
+
+:root{
+  --bg:#0b0f17;
+  --panel:#111827;
+  --panel-soft:#0f172a;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --border:rgba(255,255,255,.08);
+  --ok:#22c55e;
+  --warn:#f59e0b;
+  --info:#3b82f6;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+body{
+  font-family:var(--sans);
+  color:var(--text);
   background:
-    radial-gradient(1200px 700px at 20% 10%, rgba(59,130,246,.18), transparent 55%),
-    radial-gradient(900px 600px at 70% 60%, rgba(34,197,94,.14), transparent 55%),
+    radial-gradient(900px 600px at 20% 10%, rgba(59,130,246,.18), transparent 60%),
+    radial-gradient(700px 500px at 70% 70%, rgba(34,197,94,.14), transparent 60%),
     var(--bg);
+}
 
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+/* =========================
+   LAYOUT
+========================= */
+.wrap{
+  max-width:650px;
+  margin:0 auto;
+  padding:24px 16px 40px;
 }
-    .wrap{
-      max-width:980px;
-      margin:0 auto;
-      padding:28px 18px 40px;
-    }
-    header{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:16px;
-    }
-h1 {
-    font-size: 18px;
-    letter-spacing: .2px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
+
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px;
 }
-    .btn{
-      appearance:none;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.04);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius:12px;
-      cursor:pointer;
-      font-size:13px;
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      transition:.15s ease;
-      user-select:none;
-    }
-    .btn:hover{background:rgba(255,255,255,.07)}
-    .btn:active{transform:translateY(1px)}
-    .grid{
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:14px;
-    }
-    @media (max-width:900px){
-      .grid{grid-template-columns:1fr}
-    }
-    .card{
-      border:1px solid var(--border);
-      background:linear-gradient(180deg, rgba(17,24,39,.92), rgba(15,23,42,.88));
-      border-radius:16px;
-      overflow:hidden;
-      box-shadow:0 10px 30px rgba(0,0,0,.25);
-    }
-    .card h2{
-      margin:0;
-      font-size:13px;
-      font-weight:600;
-      letter-spacing:.25px;
-      padding:14px 14px 10px;
-      color:var(--muted);
-      border-bottom:1px solid var(--border);
-      background:rgba(255,255,255,.02);
-    }
-    .card .body{padding:14px;height: 90%;}
-    .row{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius:14px;
-      background:rgba(255,255,255,.03);
-      margin-bottom:10px;
-    }
-    .row:last-child{margin-bottom:0}
-    .k{
-      color:var(--muted);
-      font-size:12px;
-      margin-bottom:2px;
-    }
-    .v{
-      font-family:var(--mono);
-      font-size:13px;
-      word-break:break-word;
-      line-height:1.35;
-    }
-    .left{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      min-width:0;
-    }
-    .logo{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.03);
-      display:grid;
-      place-items:center;
-      flex:0 0 auto;
-    }
-    .logo svg{width:22px;height:22px;opacity:.95}
-    .titleblock{min-width:0}
-    .big{
-      font-weight:700;
-      font-size:15px;
-      margin:0;
-      line-height:1.2;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .small{
-      margin:4px 0 0;
-      color:var(--muted);
-      font-size:12px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .badge{
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.03);
-      font-size:12px;
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      white-space:nowrap;
-    }
-    .dot{
-      width:8px;height:8px;border-radius:50%;
-      background:var(--info);
-      box-shadow:0 0 0 4px rgba(59,130,246,.12);
-    }
-    .dot.ok{background:var(--ok); box-shadow:0 0 0 4px rgba(34,197,94,.12)}
-    .dot.warn{background:var(--warn); box-shadow:0 0 0 4px rgba(245,158,11,.12)}
-    .dot.bad{background:var(--bad); box-shadow:0 0 0 4px rgba(239,68,68,.12)}
-    .chips{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top: 10px;
-    }
-    .chip{
-      font-family:var(--mono);
-      font-size:12px;
-      padding:8px 10px;
-      border-radius:999px;
-      background:var(--chip);
-      border:1px solid rgba(148,163,184,.18);
-      color:#cbd5e1;
-    }
-    .debug-box{
-      width: 100%;
-      height: 100%;
-      background:rgba(0,0,0,.22);
-      color:var(--text);
-      font-family:var(--mono);
-      font-size:12px;
-      line-height:1.5;
-      padding:12px;
-      white-space:pre-wrap;
-      word-break:break-word;
-    }
-    .help{
-      margin-top:10px;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.5;
-    }
-    .help code{
-      font-family:var(--mono);
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.08);
-      padding:2px 6px;
-      border-radius:8px;
-      color:#e2e8f0;
-    }
+
+h1{
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+@media (max-width:900px){
+  .grid{grid-template-columns:1fr}
+}
+
+/* =========================
+   CARD
+========================= */
+.card{
+  overflow:hidden;
+}
+
+.card h2{
+  font-size:13px;
+  font-weight:600;
+  color:var(--muted);
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.02);
+}
+
+/* =========================
+   ROW
+========================= */
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:rgba(255,255,255,.03);
+  margin-bottom:10px;
+}
+
+.row:last-child{margin-bottom:0}
+
+.left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+.logo{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  display:grid;
+  place-items:center;
+}
+
+.titleblock{min-width:0}
+
+.big{
+  font-size:15px;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.small{
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.k{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:2px;
+}
+
+.v{
+  font-family:var(--mono);
+  font-size:13px;
+  line-height:1.35;
+  word-break:break-word;
+}
+
+/* =========================
+   BADGE
+========================= */
+.badge{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  white-space:nowrap;
+}
+
+.dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--info);
+}
+
+.dot.ok{background:var(--ok)}
+.dot.warn{background:var(--warn)}
+
+/* =========================
+   CHIPS
+========================= */
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:8px;
+}
+
+.chip{
+  font-family:var(--mono);
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(148,163,184,.14);
+  border:1px solid rgba(148,163,184,.18);
+}
+
+/* =========================
+   BUTTON
+========================= */
+.btn{
+  font-size:13px;
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.05);
+  color:var(--text);
+  cursor:pointer;
+}
+
+.btn:hover{
+  background:rgba(255,255,255,.08);
+}
   </style>
 </head>
 <body>
@@ -241,14 +232,12 @@ h1 {
 
     <div class="grid">
       <section class="card">
-        <h2>Result</h2>
         <div class="body">
           <div class="row">
             <div class="left">
               <div class="logo" id="browserLogo" aria-hidden="true"></div>
               <div class="titleblock">
                 <p class="big" id="browserName">—</p>
-                <p class="small" id="browserFamily">—</p>
               </div>
             </div>
             <span class="badge" id="chromiumBadge"><span class="dot" id="chromiumDot"></span><span id="chromiumText">—</span></span>
@@ -267,289 +256,240 @@ h1 {
 
           <div class="row">
             <div style="min-width:0">
-              <div class="k">Client Hints (brands)</div>
+              <div class="k">Client Hints</div>
               <div class="chips" id="brandChips"></div>
             </div>
           </div>
 
           <div class="row">
             <div style="min-width:0;width:100%">
-              <div class="k">Main User-Agent</div>
+              <div class="k">User-Agent</div>
               <div class="v" id="uaText">—</div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div style="min-width:0;width:100%">
+              <div class="k">JavaScript</div>
+              <div class="v" id="adblockJSStatus">—</div>
             </div>
           </div>
         </div>
       </section>
-
-      <section class="card">
-        <h2>Debug</h2>
-          <div id="debugBox" class="debug-box"></div>
-      </section>
     </div>
   </div>
 
-  <script>
-    const $ = (sel) => document.querySelector(sel);
+<script>
+  const $ = (sel) => document.querySelector(sel);
 
-    function safeInt(s) {
-      const n = parseInt(String(s || '').trim(), 10);
-      return Number.isFinite(n) ? n : null;
-    }
+  function safeInt(s) {
+    const n = parseInt(String(s || '').trim(), 10);
+    return Number.isFinite(n) ? n : null;
+  }
 
-    function firstDefined(...vals) {
-      for (const v of vals) if (v !== undefined && v !== null && v !== '') return v;
-      return '';
-    }
+  function firstDefined(...vals) {
+    for (const v of vals) if (v !== undefined && v !== null && v !== '') return v;
+    return '';
+  }
 
-    function getChromiumBadge(isChromium, name) {
-      // Safari/Firefox kesin değilse UA fallback ile karar verir.
-      // Brave/Edge/Chrome/Opera/Vivaldi/Arc vb. Chromium tabanlıdır.
-      const chromiumNames = new Set([
-        'Chrome','Google Chrome','Chromium','Microsoft Edge','Edge','Opera','Vivaldi','Brave','Arc','Wavebox','Yandex','Samsung Internet'
-      ]);
-      if (isChromium) return true;
-      if (chromiumNames.has(name)) return true;
-      return false;
-    }
+  function getChromiumBadge(isChromium, name) {
+    const chromiumNames = new Set([
+      'Chrome','Google Chrome','Chromium','Microsoft Edge','Edge','Opera',
+      'Vivaldi','Brave','Arc','Wavebox','Yandex','Samsung Internet'
+    ]);
+    if (isChromium) return true;
+    if (chromiumNames.has(name)) return true;
+    return false;
+  }
 
-    function logoIMG(kind) {
-      const map = {
-        chrome:   'src/chrome.svg',
-        chromium:'src/chromium.svg',
-        edge:     'src/edge.svg',
-        firefox:  'src/firefox.svg',
-        safari:   'src/safari.svg',
-        opera:    'src/opera.svg',
-        brave:    'src/brave.svg',
-        globe:    'src/globe.svg'
-      };
+  function logoIMG(kind) {
+    const map = {
+      chrome: 'src/chrome.svg',
+      chromium: 'src/chromium.svg',
+      edge: 'src/edge.svg',
+      firefox: 'src/firefox.svg',
+      safari: 'src/safari.svg',
+      opera: 'src/opera.svg',
+      brave: 'src/brave.svg',
+      vivaldi: 'src/vivaldi.svg',
+      yandex: 'src/yandex.svg',
+      samsung: 'src/samsung.svg',
+      duckduckgo: 'src/duckduckgo.svg',
+      arc: 'src/arc.svg',
+      wavebox: 'src/wavebox.svg',
+      globe: 'src/globe.svg'
+    };
+    const src = map[kind] || map.globe;
+    return `<img src="${src}" alt="${kind}" width="22" height="22" />`;
+  }
 
-      const src = map[kind] || map.globe;
+  function detectBrowser() {
+    const ua = navigator.userAgent || '';
+    const uaData = navigator.userAgentData;
 
-      return `<img src="${src}" alt="${kind}" width="22" height="22" />`;
-    }
+    const out = {
+      name: 'Unknown',
+      versionMajor: '',
+      versionFull: '',
+      family: 'Unknown',
+      isChromium: false,
+      brands: [],
+      platform: '',
+      engine: '',
+      matchedBy: ''
+    };
 
-    function detectBrowser() {
-      const debug = [];
-      const ua = navigator.userAgent || '';
-      const uaData = navigator.userAgentData;
+    out.platform = firstDefined(
+      uaData?.platform || '',
+      navigator.platform || ''
+    );
 
-      const out = {
-        name: 'Unknown',
-        versionMajor: '',
-        versionFull: '',
-        family: 'Unknown',
-        isChromium: false,
-        brands: [],
-        platform: '',
-        engine: '',
-        matchedBy: ''
-      };
+    if (uaData?.brands?.length) {
+      const brands = uaData.brands
+        .filter(b => b?.brand && !b.brand.toLowerCase().includes('not a'))
+        .map(b => ({ brand: b.brand, version: b.version || '' }));
 
-      out.platform = firstDefined(
-        (uaData && uaData.platform) ? uaData.platform : '',
-        navigator.platform || ''
-      );
+      out.brands = brands;
 
-      if (uaData && Array.isArray(uaData.brands) && uaData.brands.length) {
-        const brands = uaData.brands
-          .filter(b => b && b.brand && !b.brand.toLowerCase().includes('not a'))
-          .map(b => ({ brand: b.brand, version: b.version || '' }));
+      const pick = (n) =>
+        brands.find(b => b.brand.toLowerCase() === n.toLowerCase());
 
-        out.brands = brands;
-
-        debug.push('[CH] brands: ' + brands.map(b => `${b.brand} ${b.version}`).join(', '));
-
-        const pick = (brandName) => brands.find(b => b.brand.toLowerCase() === brandName.toLowerCase());
-
-        if (pick('Microsoft Edge') || pick('Microsoft Edge WebView2')) {
-          const b = pick('Microsoft Edge') || pick('Microsoft Edge WebView2');
-          out.name = 'Microsoft Edge';
-          out.family = 'Edge';
-          out.versionFull = b.version;
-          out.versionMajor = String(safeInt(b.version) ?? b.version);
-          out.isChromium = true;
-          out.matchedBy = 'client-hints';
-          debug.push('[CH] matched: Edge');
-          return { out, debug: debug.join('\n') };
-        }
-
-        if (pick('Opera')) {
-          const b = pick('Opera');
-          out.name = 'Opera';
-          out.family = 'Opera';
-          out.versionFull = b.version;
-          out.versionMajor = String(safeInt(b.version) ?? b.version);
-          out.isChromium = true;
-          out.matchedBy = 'client-hints';
-          debug.push('[CH] matched: Opera');
-          return { out, debug: debug.join('\n') };
-        }
-
-        if (pick('Brave')) {
-          const b = pick('Brave');
-          out.name = 'Brave';
-          out.family = 'Brave';
-          out.versionFull = b.version;
-          out.versionMajor = String(safeInt(b.version) ?? b.version);
-          out.isChromium = true;
-          out.matchedBy = 'client-hints';
-          debug.push('[CH] matched: Brave');
-          return { out, debug: debug.join('\n') };
-        }
-
-        const special = ['Vivaldi','Arc','Wavebox','Yandex','Samsung Internet','Chromium'];
-        for (const s of special) {
-          const b = pick(s);
-          if (b) {
-            out.name = s;
-            out.family = s;
-            out.versionFull = b.version;
-            out.versionMajor = String(safeInt(b.version) ?? b.version);
-            out.isChromium = true;
-            out.matchedBy = 'client-hints';
-            debug.push('[CH] matched: ' + s);
-            return { out, debug: debug.join('\n') };
-          }
-        }
-
-        if (pick('Google Chrome') || pick('Chromium') || pick('Chrome')) {
-          const b = pick('Google Chrome') || pick('Chromium') || pick('Chrome');
-          out.name = b.brand === 'Chromium' ? 'Chromium' : 'Chrome';
-          out.family = out.name;
-          out.versionFull = b.version;
-          out.versionMajor = String(safeInt(b.version) ?? b.version);
-          out.isChromium = true;
-          out.matchedBy = 'client-hints';
-          debug.push('[CH] matched: ' + out.name);
-          return { out, debug: debug.join('\n') };
-        }
-
-        debug.push('[CH] no direct known match, fallback to UA parsing');
-      } else {
-        debug.push('[CH] not available');
-      }
-
-      const rules = [
-        { name: 'Samsung Internet', family: 'Samsung Internet', re: /SamsungBrowser\/(\d+(\.\d+)?)/, chromium: true },
-        { name: 'YaBrowser', family: 'Yandex', re: /YaBrowser\/(\d+(\.\d+)?)/, chromium: true },
-        { name: 'DuckDuckGo', family: 'DuckDuckGo', re: /DuckDuckGo\/(\d+(\.\d+)?)/, chromium: false },
-        { name: 'Vivaldi', family: 'Vivaldi', re: /Vivaldi\/(\d+(\.\d+)?)/, chromium: true },
-        { name: 'Opera', family: 'Opera', re: /OPR\/(\d+(\.\d+)?)/, chromium: true },
-        { name: 'Opera', family: 'Opera', re: /Opera\/(\d+(\.\d+)?)/, chromium: true },
-        { name: 'Microsoft Edge', family: 'Edge', re: /Edg\/(\d+(\.\d+)?)/, chromium: true },
-        { name: 'Brave', family: 'Brave', re: /Brave\/(\d+(\.\d+)?)/, chromium: true },
-        { name: 'Arc', family: 'Arc', re: /Arc\/(\d+(\.\d+)?)/, chromium: true },
-        { name: 'Wavebox', family: 'Wavebox', re: /Wavebox\/(\d+(\.\d+)?)/, chromium: true },
-        { name: 'Chromium', family: 'Chromium', re: /Chromium\/(\d+(\.\d+)?)/, chromium: true },
-        { name: 'Chrome', family: 'Chrome', re: /Chrome\/(\d+(\.\d+)?)/, chromium: true },
-        { name: 'Firefox', family: 'Firefox', re: /Firefox\/(\d+(\.\d+)?)/, chromium: false },
-        { name: 'Firefox iOS', family: 'Firefox', re: /FxiOS\/(\d+(\.\d+)?)/, chromium: false },
-        { name: 'Safari', family: 'Safari', re: /Version\/(\d+(\.\d+)?).*Safari\//, chromium: false },
+      const known = [
+        ['Microsoft Edge','Edge',true],
+        ['Opera','Opera',true],
+        ['Brave','Brave',true],
+        ['Vivaldi','Vivaldi',true],
+        ['Arc','Arc',true],
+        ['Wavebox','Wavebox',true],
+        ['Yandex','Yandex',true],
+        ['Samsung Internet','Samsung Internet',true],
+        ['Chromium','Chromium',true],
+        ['Google Chrome','Chrome',true],
+        ['Chrome','Chrome',true]
       ];
 
-      debug.push('[UA] ua: ' + ua);
-
-      const hasBraveObj = (typeof navigator.brave === 'object');
-      if (hasBraveObj) debug.push('[UA] navigator.brave detected');
-
-      for (const r of rules) {
-        const m = ua.match(r.re);
-        if (m) {
-          out.name = (r.name === 'Brave' && hasBraveObj) ? 'Brave' : r.name;
-          out.family = r.family;
-          out.versionFull = m[1] || '';
-          out.versionMajor = String(safeInt(out.versionFull) ?? out.versionFull);
-          out.isChromium = r.chromium;
-          out.matchedBy = 'user-agent';
-          debug.push('[UA] matched rule: ' + r.name);
-          break;
+      for (const [brand,family,chromium] of known) {
+        const b = pick(brand);
+        if (b) {
+          out.name = family;
+          out.family = family;
+          out.versionFull = b.version;
+          out.versionMajor = String(safeInt(b.version) ?? b.version);
+          out.isChromium = chromium;
+          out.matchedBy = 'client-hints';
+          return { out };
         }
       }
-
-      if (out.name === 'Unknown' && hasBraveObj) {
-        out.name = 'Brave';
-        out.family = 'Brave';
-        out.isChromium = true;
-        out.matchedBy = 'navigator.brave';
-        debug.push('[UA] fallback matched: Brave via navigator.brave');
-      }
-
-      if (out.family === 'Safari') out.engine = 'WebKit';
-      else if (out.family === 'Firefox') out.engine = 'Gecko';
-      else if (out.isChromium) out.engine = 'Blink';
-      else out.engine = 'Unknown';
-
-      return { out, debug: debug.join('\n') };
     }
 
-    function render() {
-      const { out, debug } = detectBrowser();
+    const rules = [
+      { name:'Samsung Internet', family:'Samsung Internet', re:/SamsungBrowser\/([\d.]+)/, chromium:true },
+      { name:'Yandex', family:'Yandex', re:/YaBrowser\/([\d.]+)/, chromium:true },
+      { name:'DuckDuckGo', family:'DuckDuckGo', re:/DuckDuckGo\/([\d.]+)/, chromium:false },
+      { name:'Vivaldi', family:'Vivaldi', re:/Vivaldi\/([\d.]+)/, chromium:true },
+      { name:'Opera', family:'Opera', re:/OPR\/([\d.]+)/, chromium:true },
+      { name:'Microsoft Edge', family:'Edge', re:/Edg\/([\d.]+)/, chromium:true },
+      { name:'Brave', family:'Brave', re:/Brave\/([\d.]+)/, chromium:true },
+      { name:'Arc', family:'Arc', re:/Arc\/([\d.]+)/, chromium:true },
+      { name:'Wavebox', family:'Wavebox', re:/Wavebox\/([\d.]+)/, chromium:true },
+      { name:'Chromium', family:'Chromium', re:/Chromium\/([\d.]+)/, chromium:true },
+      { name:'Chrome', family:'Chrome', re:/Chrome\/([\d.]+)/, chromium:true },
+      { name:'Firefox', family:'Firefox', re:/Firefox\/([\d.]+)/, chromium:false },
+      { name:'Firefox iOS', family:'Firefox', re:/FxiOS\/([\d.]+)/, chromium:false },
+      { name:'Safari', family:'Safari', re:/Version\/([\d.]+).*Safari/, chromium:false }
+    ];
 
-      const kind = (() => {
-        const n = out.name.toLowerCase();
-        if (n.includes('edge')) return 'edge';
-        if (n.includes('firefox')) return 'firefox';
-        if (n.includes('safari')) return 'safari';
-        if (n.includes('opera')) return 'opera';
-        if (n.includes('brave')) return 'brave';
-        if (n.includes('chromium')) return 'chromium';
-        if (n.includes('chrome')) return 'chrome';
-        return 'globe';
-      })();
+    const hasBraveObj = typeof navigator.brave === 'object';
 
-      $('#browserLogo').innerHTML = logoIMG(kind);
+    for (const r of rules) {
+      const m = ua.match(r.re);
+      if (m) {
+        out.name = r.name;
+        out.family = r.family;
+        out.versionFull = m[1];
+        out.versionMajor = String(safeInt(m[1]) ?? m[1]);
+        out.isChromium = r.chromium;
+        out.matchedBy = 'user-agent';
+        break;
+      }
+    }
 
-      const isChromium = getChromiumBadge(out.isChromium, out.name);
+    if (out.family === 'Safari') out.engine = 'WebKit';
+    else if (out.family === 'Firefox') out.engine = 'Gecko';
+    else if (out.isChromium) out.engine = 'Blink';
+    else out.engine = 'Unknown';
 
-      $('#browserName').textContent = out.name;
-      $('#browserFamily').textContent = `${out.engine} • ${out.family} • ${out.matchedBy || '—'}`;
+    return { out };
+  }
 
-      $('#browserVersion').textContent = out.versionMajor
-        ? `${out.versionMajor}${out.versionFull && out.versionFull !== out.versionMajor ? ` (${out.versionFull})` : ''}`
-        : (out.versionFull || 'Unavailable');
+  function render() {
+    const { out } = detectBrowser();
 
-      $('#platformInfo').textContent = out.platform || 'Unavailable';
+    const kind = (() => {
+      const n = out.name.toLowerCase();
+      if (n.includes('edge')) return 'edge';
+      if (n.includes('firefox')) return 'firefox';
+      if (n.includes('safari')) return 'safari';
+      if (n.includes('opera')) return 'opera';
+      if (n.includes('brave')) return 'brave';
+      if (n.includes('vivaldi')) return 'vivaldi';
+      if (n.includes('yandex')) return 'yandex';
+      if (n.includes('samsung')) return 'samsung';
+      if (n.includes('duck')) return 'duckduckgo';
+      if (n.includes('arc')) return 'arc';
+      if (n.includes('wavebox')) return 'wavebox';
+      if (n.includes('chromium')) return 'chromium';
+      if (n.includes('chrome')) return 'chrome';
+      return 'globe';
+    })();
 
-      const chips = $('#brandChips');
-      chips.innerHTML = '';
-      if (out.brands && out.brands.length) {
-        for (const b of out.brands) {
-          const el = document.createElement('span');
-          el.className = 'chip';
-          el.textContent = `${b.brand} ${b.version || ''}`.trim();
-          chips.appendChild(el);
-        }
-      } else {
+    const jsEnabled = typeof window !== 'undefined' && 'JSON' in window;
+    $('#adblockJSStatus').textContent = jsEnabled ? 'Enabled' : 'Disabled';
+
+    $('#browserLogo').innerHTML = logoIMG(kind);
+    $('#browserName').textContent = out.name;
+
+    $('#browserVersion').textContent = out.versionMajor
+      ? `${out.versionMajor}${out.versionFull && out.versionFull !== out.versionMajor ? ` (${out.versionFull})` : ''}`
+      : (out.versionFull || 'Unavailable');
+
+    $('#platformInfo').textContent = out.platform || 'Unavailable';
+
+    const chips = $('#brandChips');
+    chips.innerHTML = '';
+    if (out.brands?.length) {
+      for (const b of out.brands) {
         const el = document.createElement('span');
         el.className = 'chip';
-        el.textContent = 'Not available';
+        el.textContent = `${b.brand} ${b.version || ''}`.trim();
         chips.appendChild(el);
       }
-
-      $('#uaText').textContent = navigator.userAgent || 'Unavailable';
-
-      const dot = $('#chromiumDot');
-      const label = $('#chromiumText');
-      if (isChromium) {
-        dot.className = 'dot ok';
-        label.textContent = 'Chromium';
-      } else if (out.name === 'Unknown') {
-        dot.className = 'dot warn';
-        label.textContent = 'Belirsiz';
-      } else {
-        dot.className = 'dot info';
-        label.textContent = 'Gecko';
-      }
-
-      $('#debugBox').textContent =
-        `name=${out.name}\nfamily=${out.family}\nengine=${out.engine}\nversionMajor=${out.versionMajor}\nversionFull=${out.versionFull}\nplatform=${out.platform}\nisChromium=${isChromium}\nmatchedBy=${out.matchedBy}\n\n` +
-        debug;
+    } else {
+      const el = document.createElement('span');
+      el.className = 'chip';
+      el.textContent = 'Not available';
+      chips.appendChild(el);
     }
 
-    $('#btnRefresh').addEventListener('click', render);
-    render();
-  </script>
+    $('#uaText').textContent = navigator.userAgent || 'Unavailable';
+
+    const dot = $('#chromiumDot');
+    const label = $('#chromiumText');
+    if (getChromiumBadge(out.isChromium, out.name)) {
+      dot.className = 'dot ok';
+      label.textContent = 'Chromium';
+    } else if (out.name === 'Unknown') {
+      dot.className = 'dot warn';
+      label.textContent = 'Belirsiz';
+    } else {
+      dot.className = 'dot info';
+      label.textContent = out.engine || 'Unknown';
+    }
+  }
+
+  $('#btnRefresh').addEventListener('click', render);
+  render();
+</script>
+
 </body>
 </html>
-
