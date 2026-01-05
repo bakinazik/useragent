@@ -280,223 +280,179 @@ h1{
   </div>
 
 <script>
-  const $ = (sel) => document.querySelector(sel);
+class BrowserDetector {
+  #rules = [
+    { name: 'Samsung Internet', family: 'Samsung Internet', re: /SamsungBrowser\/([\d.]+)/, chromium: true },
+    { name: 'Yandex', family: 'Yandex', re: /YaBrowser\/([\d.]+)/, chromium: true },
+    { name: 'DuckDuckGo', family: 'DuckDuckGo', re: /DuckDuckGo\/([\d.]+)/, chromium: false },
+    { name: 'Vivaldi', family: 'Vivaldi', re: /Vivaldi\/([\d.]+)/, chromium: true },
+    { name: 'Opera', family: 'Opera', re: /OPR\/([\d.]+)/, chromium: true },
+    { name: 'Edge', family: 'Edge', re: /Edg\/([\d.]+)/, chromium: true },
+    { name: 'Brave', family: 'Brave', re: /Brave\/([\d.]+)/, chromium: true },
+    { name: 'Arc', family: 'Arc', re: /Arc\/([\d.]+)/, chromium: true },
+    { name: 'Wavebox', family: 'Wavebox', re: /Wavebox\/([\d.]+)/, chromium: true },
+    { name: 'Chromium', family: 'Chromium', re: /Chromium\/([\d.]+)/, chromium: true },
+    { name: 'Chrome', family: 'Chrome', re: /Chrome\/([\d.]+)/, chromium: true },
+    { name: 'Firefox', family: 'Firefox', re: /Firefox\/([\d.]+)/, chromium: false },
+    { name: 'Firefox iOS', family: 'Firefox', re: /FxiOS\/([\d.]+)/, chromium: false },
+    { name: 'Safari', family: 'Safari', re: /Version\/([\d.]+).*Safari/, chromium: false }
+  ];
 
-  function safeInt(s) {
-    const n = parseInt(String(s || '').trim(), 10);
-    return Number.isFinite(n) ? n : null;
+  #logoMap = {
+    chrome: 'src/chrome.svg',
+    chromium: 'src/chromium.svg',
+    edge: 'src/edge.svg',
+    firefox: 'src/firefox.svg',
+    safari: 'src/safari.svg',
+    opera: 'src/opera.svg',
+    brave: 'src/brave.svg',
+    vivaldi: 'src/vivaldi.svg',
+    yandex: 'src/yandex.svg',
+    samsung: 'src/samsung.svg',
+    duckduckgo: 'src/duckduckgo.svg',
+    arc: 'src/arc.svg',
+    wavebox: 'src/wavebox.svg'
+  };
+
+  constructor() {
+    this.ua = navigator.userAgent;
+    this.uaData = navigator.userAgentData;
   }
 
-  function firstDefined(...vals) {
-    for (const v of vals) if (v !== undefined && v !== null && v !== '') return v;
-    return '';
+  get data() {
+    const platform = this.uaData?.platform || navigator.platform || 'Unknown';
+    const clientHints = this.#parseClientHints();
+    
+    if (clientHints) return { ...clientHints, platform };
+    
+    const legacy = this.#parseUserAgent();
+    return { ...legacy, platform };
   }
 
-  function getChromiumBadge(isChromium, name) {
-    const chromiumNames = new Set([
-      'Chrome','Google Chrome','Chromium','Microsoft Edge','Edge','Opera',
-      'Vivaldi','Brave','Arc','Wavebox','Yandex','Samsung Internet'
-    ]);
-    if (isChromium) return true;
-    if (chromiumNames.has(name)) return true;
-    return false;
+  #parseClientHints() {
+    if (!this.uaData?.brands?.length) return null;
+
+    const brands = this.uaData.brands
+      .filter(b => !/not.a.brand/i.test(b.brand))
+      .map(b => ({ brand: b.brand, version: b.version }));
+
+    const priority = ['Microsoft Edge', 'Opera', 'Brave', 'Vivaldi', 'Arc', 'Wavebox', 'Yandex', 'Samsung Internet', 'Google Chrome', 'Chromium'];
+    
+    for (const name of priority) {
+      const found = brands.find(b => b.brand === name);
+      if (found) {
+        const family = found.brand.replace('Google ', '');
+        return {
+          name: family,
+          family: family,
+          versionFull: found.version,
+          versionMajor: found.version.split('.')[0],
+          isChromium: true,
+          engine: 'Blink',
+          brands
+        };
+      }
+    }
+    return null;
   }
 
-  function logoIMG(kind) {
-    const map = {
-      chrome: 'src/chrome.svg',
-      chromium: 'src/chromium.svg',
-      edge: 'src/edge.svg',
-      firefox: 'src/firefox.svg',
-      safari: 'src/safari.svg',
-      opera: 'src/opera.svg',
-      brave: 'src/brave.svg',
-      vivaldi: 'src/vivaldi.svg',
-      yandex: 'src/yandex.svg',
-      samsung: 'src/samsung.svg',
-      duckduckgo: 'src/duckduckgo.svg',
-      arc: 'src/arc.svg',
-      wavebox: 'src/wavebox.svg',
-      globe: 'src/globe.svg'
+  #parseUserAgent() {
+    for (const rule of this.#rules) {
+      const match = this.ua.match(rule.re);
+      if (match) {
+        return {
+          name: rule.name,
+          family: rule.family,
+          versionFull: match[1],
+          versionMajor: match[1].split('.')[0],
+          isChromium: rule.chromium,
+          engine: this.#getEngine(rule.family, rule.chromium),
+          brands: []
+        };
+      }
+    }
+    return { name: 'Unknown', family: 'Unknown', versionFull: '', versionMajor: '', isChromium: false, engine: 'Unknown', brands: [] };
+  }
+
+  #getEngine(family, isChromium) {
+    if (family === 'Safari') return 'WebKit';
+    if (family === 'Firefox') return 'Gecko';
+    return isChromium ? 'Blink' : 'Unknown';
+  }
+
+  getIcon(name) {
+    const key = name.toLowerCase().split(' ')[0];
+    return this.#logoMap[key] || 'src/globe.svg';
+  }
+}
+
+class BrowserUI {
+  constructor(detector) {
+    this.detector = detector;
+    this.nodes = {
+      logo: document.querySelector('#browserLogo'),
+      name: document.querySelector('#browserName'),
+      version: document.querySelector('#browserVersion'),
+      platform: document.querySelector('#platformInfo'),
+      ua: document.querySelector('#uaText'),
+      chips: document.querySelector('#brandChips'),
+      dot: document.querySelector('#chromiumDot'),
+      status: document.querySelector('#chromiumText'),
+      jsStatus: document.querySelector('#adblockJSStatus'),
+      refresh: document.querySelector('#btnRefresh')
     };
-    const src = map[kind] || map.globe;
-    return `<img src="${src}" alt="${kind}" width="22" height="22" />`;
+    this.init();
   }
 
-  function detectBrowser() {
-    const ua = navigator.userAgent || '';
-    const uaData = navigator.userAgentData;
-
-    const out = {
-      name: 'Unknown',
-      versionMajor: '',
-      versionFull: '',
-      family: 'Unknown',
-      isChromium: false,
-      brands: [],
-      platform: '',
-      engine: '',
-      matchedBy: ''
-    };
-
-    out.platform = firstDefined(
-      uaData?.platform || '',
-      navigator.platform || ''
-    );
-
-    if (uaData?.brands?.length) {
-      const brands = uaData.brands
-        .filter(b => {
-          if (!b || !b.brand) return false;
-          const name = b.brand.toLowerCase();
-          if (name.includes('not') && name.includes('brand')) return false;
-          if (name === 'chromium') return true;
-          return true;
-        })
-        .map(b => ({ brand: b.brand, version: b.version || '' }));
-
-      out.brands = brands;
-
-      const pick = (n) =>
-        brands.find(b => b.brand.toLowerCase() === n.toLowerCase());
-
-      const known = [
-        ['Microsoft Edge','Edge',true],
-        ['Opera','Opera',true],
-        ['Brave','Brave',true],
-        ['Vivaldi','Vivaldi',true],
-        ['Arc','Arc',true],
-        ['Wavebox','Wavebox',true],
-        ['Yandex','Yandex',true],
-        ['Samsung Internet','Samsung Internet',true],
-        ['Chromium','Chromium',true],
-        ['Google Chrome','Chrome',true],
-        ['Chrome','Chrome',true]
-      ];
-
-      for (const [brand,family,chromium] of known) {
-        const b = pick(brand);
-        if (b) {
-          out.name = family;
-          out.family = family;
-          out.versionFull = b.version;
-          out.versionMajor = String(safeInt(b.version) ?? b.version);
-          out.isChromium = chromium;
-          out.matchedBy = 'client-hints';
-          return { out };
-        }
-      }
-    }
-
-    const rules = [
-      { name:'Samsung Internet', family:'Samsung Internet', re:/SamsungBrowser\/([\d.]+)/, chromium:true },
-      { name:'Yandex', family:'Yandex', re:/YaBrowser\/([\d.]+)/, chromium:true },
-      { name:'DuckDuckGo', family:'DuckDuckGo', re:/DuckDuckGo\/([\d.]+)/, chromium:false },
-      { name:'Vivaldi', family:'Vivaldi', re:/Vivaldi\/([\d.]+)/, chromium:true },
-      { name:'Opera', family:'Opera', re:/OPR\/([\d.]+)/, chromium:true },
-      { name:'Microsoft Edge', family:'Edge', re:/Edg\/([\d.]+)/, chromium:true },
-      { name:'Brave', family:'Brave', re:/Brave\/([\d.]+)/, chromium:true },
-      { name:'Arc', family:'Arc', re:/Arc\/([\d.]+)/, chromium:true },
-      { name:'Wavebox', family:'Wavebox', re:/Wavebox\/([\d.]+)/, chromium:true },
-      { name:'Chromium', family:'Chromium', re:/Chromium\/([\d.]+)/, chromium:true },
-      { name:'Chrome', family:'Chrome', re:/Chrome\/([\d.]+)/, chromium:true },
-      { name:'Firefox', family:'Firefox', re:/Firefox\/([\d.]+)/, chromium:false },
-      { name:'Firefox iOS', family:'Firefox', re:/FxiOS\/([\d.]+)/, chromium:false },
-      { name:'Safari', family:'Safari', re:/Version\/([\d.]+).*Safari/, chromium:false }
-    ];
-
-    const hasBraveObj = typeof navigator.brave === 'object';
-
-    for (const r of rules) {
-      const m = ua.match(r.re);
-      if (m) {
-        out.name = r.name;
-        out.family = r.family;
-        out.versionFull = m[1];
-        out.versionMajor = String(safeInt(m[1]) ?? m[1]);
-        out.isChromium = r.chromium;
-        out.matchedBy = 'user-agent';
-        break;
-      }
-    }
-
-    if (out.family === 'Safari') out.engine = 'WebKit';
-    else if (out.family === 'Firefox') out.engine = 'Gecko';
-    else if (out.isChromium) out.engine = 'Blink';
-    else out.engine = 'Unknown';
-
-    return { out };
+  init() {
+    this.nodes.refresh?.addEventListener('click', () => this.update());
+    this.update();
   }
 
-  function render() {
-    const { out } = detectBrowser();
+  update() {
+    const info = this.detector.data;
+    
+    this.nodes.jsStatus.textContent = 'Enabled';
+    this.nodes.name.textContent = info.name;
+    this.nodes.platform.textContent = info.platform;
+    this.nodes.ua.textContent = this.detector.ua;
+    
+    this.nodes.logo.innerHTML = `<img src="${this.detector.getIcon(info.name)}" alt="logo" width="22" height="22" />`;
+    
+    this.nodes.version.textContent = info.versionMajor 
+      ? `${info.versionMajor}${info.versionFull !== info.versionMajor ? ` (${info.versionFull})` : ''}`
+      : 'Unavailable';
 
-    const kind = (() => {
-      const n = out.name.toLowerCase();
-      if (n.includes('edge')) return 'edge';
-      if (n.includes('firefox')) return 'firefox';
-      if (n.includes('safari')) return 'safari';
-      if (n.includes('opera')) return 'opera';
-      if (n.includes('brave')) return 'brave';
-      if (n.includes('vivaldi')) return 'vivaldi';
-      if (n.includes('yandex')) return 'yandex';
-      if (n.includes('samsung')) return 'samsung';
-      if (n.includes('duck')) return 'duckduckgo';
-      if (n.includes('arc')) return 'arc';
-      if (n.includes('wavebox')) return 'wavebox';
-      if (n.includes('chromium')) return 'chromium';
-      if (n.includes('chrome')) return 'chrome';
-      return 'globe';
-    })();
+    this.#renderBrands(info.brands);
+    this.#renderEngineBadge(info);
+  }
 
-    const jsEnabled = typeof window !== 'undefined' && 'JSON' in window;
-    $('#adblockJSStatus').textContent = jsEnabled ? 'Enabled' : 'Disabled';
+  #renderBrands(brands) {
+    this.nodes.chips.innerHTML = brands.length 
+      ? brands.map(b => `<span class="chip">${b.brand} ${b.version}</span>`).join('')
+      : '<span class="chip">Not available</span>';
+  }
 
-    $('#browserLogo').innerHTML = logoIMG(kind);
-    $('#browserName').textContent = out.name;
-
-    $('#browserVersion').textContent = out.versionMajor
-      ? `${out.versionMajor}${out.versionFull && out.versionFull !== out.versionMajor ? ` (${out.versionFull})` : ''}`
-      : (out.versionFull || 'Unavailable');
-
-    $('#platformInfo').textContent = out.platform || 'Unavailable';
-
-    const chips = $('#brandChips');
-    chips.innerHTML = '';
-    if (out.brands?.length) {
-      for (const b of out.brands) {
-        const el = document.createElement('span');
-        el.className = 'chip';
-        el.textContent = `${b.brand} ${b.version || ''}`.trim();
-        chips.appendChild(el);
-      }
+  #renderEngineBadge(info) {
+    const isChromium = info.isChromium || ['Chrome', 'Edge', 'Opera', 'Brave', 'Vivaldi', 'Arc'].includes(info.family);
+    
+    if (isChromium) {
+      this.nodes.dot.className = 'dot ok';
+      this.nodes.status.textContent = 'Chromium';
+    } else if (info.name === 'Unknown') {
+      this.nodes.dot.className = 'dot warn';
+      this.nodes.status.textContent = 'Unknown';
     } else {
-      const el = document.createElement('span');
-      el.className = 'chip';
-      el.textContent = 'Not available';
-      chips.appendChild(el);
-    }
-
-    $('#uaText').textContent = navigator.userAgent || 'Unavailable';
-
-    const dot = $('#chromiumDot');
-    const label = $('#chromiumText');
-    if (getChromiumBadge(out.isChromium, out.name)) {
-      dot.className = 'dot ok';
-      label.textContent = 'Chromium';
-    } else if (out.name === 'Unknown') {
-      dot.className = 'dot warn';
-      label.textContent = 'Belirsiz';
-    } else {
-      dot.className = 'dot info';
-      label.textContent = out.engine || 'Unknown';
+      this.nodes.dot.className = 'dot info';
+      this.nodes.status.textContent = info.engine;
     }
   }
+}
 
-  $('#btnRefresh').addEventListener('click', render);
-  render();
+new BrowserUI(new BrowserDetector());
 </script>
 
 </body>
 </html>
+
 
