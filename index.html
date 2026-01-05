@@ -346,7 +346,13 @@ h1{
 
     if (uaData?.brands?.length) {
       const brands = uaData.brands
-        .filter(b => b?.brand && !b.brand.toLowerCase().includes('not a'))
+        .filter(b => {
+          if (!b || !b.brand) return false;
+          const name = b.brand.toLowerCase();
+          if (name.includes('not') && name.includes('brand')) return false;
+          if (name === 'chromium') return true;
+          return true;
+        })
         .map(b => ({ brand: b.brand, version: b.version || '' }));
 
       out.brands = brands;
@@ -493,3 +499,4 @@ h1{
 
 </body>
 </html>
+
