@@ -39,8 +39,8 @@ body{
   font-family:var(--sans);
   color:var(--text);
   background:
-    radial-gradient(900px 600px at 20% 10%, rgba(59,130,246,.18), transparent 60%),
-    radial-gradient(700px 500px at 70% 70%, rgba(34,197,94,.14), transparent 60%),
+    radial-gradient(1080px 720px at 20% 10%, rgba(59,130,246,.18), transparent 60%),
+    radial-gradient(840px 600px at 70% 70%, rgba(34,197,94,.14), transparent 60%),
     var(--bg);
 }
 
@@ -48,29 +48,29 @@ body{
    LAYOUT
 ========================= */
 .wrap{
-  max-width:650px;
+  max-width:780px;
   margin:0 auto;
-  padding:24px 16px 40px;
+  padding:29px 19px 48px;
 }
 
 header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:16px;
+  margin-bottom:19px;
 }
 
 h1{
-  font-size:18px;
+  font-size:22px;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:12px;
 }
 
 .grid{
   display:grid;
   grid-template-columns:1fr;
-  gap:14px;
+  gap:17px;
 }
 
 @media (max-width:900px){
@@ -85,10 +85,10 @@ h1{
 }
 
 .card h2{
-  font-size:13px;
+  font-size:16px;
   font-weight:600;
   color:var(--muted);
-  padding:12px 14px;
+  padding:14px 17px;
   border-bottom:1px solid var(--border);
   background:rgba(255,255,255,.02);
 }
@@ -100,12 +100,12 @@ h1{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:12px;
-  padding:10px 12px;
+  gap:14px;
+  padding:12px 14px;
   border:1px solid var(--border);
-  border-radius:12px;
+  border-radius:14px;
   background:rgba(255,255,255,.03);
-  margin-bottom:10px;
+  margin-bottom:12px;
 }
 
 .row:last-child{margin-bottom:0}
@@ -113,27 +113,27 @@ h1{
 .left{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:12px;
   min-width:0;
 }
 
 .logo{
-  width:42px;
-  height:42px;
-  border-radius:12px;
+  width:50px;
+  height:50px;
+  border-radius:14px;
   border:1px solid var(--border);
   display:grid;
   place-items:center;
 }
 
 .logo img{
-    max-width: 24px;
+  max-width:29px;
 }
 
 .titleblock{min-width:0}
 
 .big{
-  font-size:15px;
+  font-size:18px;
   font-weight:700;
   white-space:nowrap;
   overflow:hidden;
@@ -141,7 +141,7 @@ h1{
 }
 
 .small{
-  font-size:12px;
+  font-size:14px;
   color:var(--muted);
   white-space:nowrap;
   overflow:hidden;
@@ -149,15 +149,15 @@ h1{
 }
 
 .k{
-  font-size:12px;
+  font-size:14px;
   color:var(--muted);
-  margin-bottom:2px;
+  margin-bottom:3px;
 }
 
 .v{
   font-family:var(--mono);
-  font-size:13px;
-  line-height:1.35;
+  font-size:16px;
+  line-height:1.4;
   word-break:break-word;
 }
 
@@ -167,9 +167,9 @@ h1{
 .badge{
   display:flex;
   align-items:center;
-  gap:8px;
-  font-size:12px;
-  padding:6px 10px;
+  gap:10px;
+  font-size:14px;
+  padding:7px 12px;
   border-radius:999px;
   border:1px solid var(--border);
   background:rgba(255,255,255,.03);
@@ -177,8 +177,8 @@ h1{
 }
 
 .dot{
-  width:8px;
-  height:8px;
+  width:10px;
+  height:10px;
   border-radius:50%;
   background:var(--info);
 }
@@ -192,14 +192,14 @@ h1{
 .chips{
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
-  margin-top:8px;
+  gap:10px;
+  margin-top:10px;
 }
 
 .chip{
   font-family:var(--mono);
-  font-size:12px;
-  padding:6px 10px;
+  font-size:14px;
+  padding:7px 12px;
   border-radius:999px;
   background:rgba(148,163,184,.14);
   border:1px solid rgba(148,163,184,.18);
@@ -209,9 +209,9 @@ h1{
    BUTTON
 ========================= */
 .btn{
-  font-size:13px;
-  padding:8px 12px;
-  border-radius:10px;
+  font-size:16px;
+  padding:10px 14px;
+  border-radius:12px;
   border:1px solid var(--border);
   background:rgba(255,255,255,.05);
   color:var(--text);
@@ -443,4 +443,5 @@ new BrowserUI(new BrowserDetector());
 </script>
 </body>
 </html>
+
 
